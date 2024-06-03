@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import timedelta
 from typing import List
 from models.equipe import Equipe
 from models.jalon import Jalon
@@ -82,15 +83,26 @@ class Projet:
         rapport += "\nChemin Critique:\n"
         chemin_critique = self.calculer_chemin_critique()
         for tache in chemin_critique:
-            rapport += f" - {tache.nom}\n"
+             rapport += f" - {tache.nom} ({tache.date_debut.strftime('%Y-%m-%d')} à {tache.date_fin.strftime('%Y-%m-%d')})\n"
+    
         
         return rapport
 
-    def calculer_chemin_critique(self) -> List[Tache]:
+    def calculer_chemin_critique(self):
+        # Assurez-vous que les dates de début et de fin sont calculées correctement.
+        for tache in self.taches:
+            tache.fin_tot = tache.date_debut + timedelta(days=(tache.date_fin - tache.date_debut).days)
+            tache.debut_tot = tache.date_debut
+
         chemin_critique = []
         for tache in self.taches:
-            if not tache.dependances:
+            if tache.dependances:
+                max_fin = max(dep.fin_tot for dep in tache.dependances)
+                tache.debut_tot = max_fin
+                tache.fin_tot = tache.debut_tot + timedelta(days=(tache.date_fin - tache.date_debut).days)
+            if tache.fin_tot == max(t.fin_tot for t in self.taches):
                 chemin_critique.append(tache)
+
         return chemin_critique
 
     def notifier(self, message: str, destinataires: List[Membre]) -> None:

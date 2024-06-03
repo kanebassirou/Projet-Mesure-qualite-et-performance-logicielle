@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import List
 from models.membre import Membre
-
 class Tache:
     def __init__(self, nom: str, description: str, date_debut: datetime, date_fin: datetime, responsable: Membre, statut: str):
         self.nom = nom
@@ -11,9 +10,11 @@ class Tache:
         self.responsable = responsable
         self.statut = statut
         self.dependances = []
+        self.duree = (date_fin - date_debut).days  # Calcul de la durée en jours
 
-    def ajouter_dependance(self, tache: 'Tache') -> None:
+    def ajouter_dependance(self, tache):
         self.dependances.append(tache)
+
 
     def mettre_a_jour_statut(self, statut: str) -> None:
         self.statut = statut

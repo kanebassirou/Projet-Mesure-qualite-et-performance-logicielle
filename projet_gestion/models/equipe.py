@@ -1,6 +1,7 @@
 from typing import List
 from models.membre import Membre
 
+
 class Equipe:
     def __init__(self):
         self.membres = []
